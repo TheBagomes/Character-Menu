@@ -1,4 +1,8 @@
 import yasuoImage from "../assets/characters/yasuo/yasuo.jpg";
+import rivenImage from "../assets/characters/riven/riven.jpg";
+import zedImage from "../assets/characters/zed/zed.jpg";
+import auroraImage from "../assets/characters/aurora/aurora.jpg";
+import ireliaImage from "../assets/characters/irelia/irelia.jpg";
 
 export const characters = [
   {
@@ -19,6 +23,7 @@ export const characters = [
     name: "RIVEN",
     title: "THE EXILE",
     role: "FIGHTER",
+    image: rivenImage,
 
     theme: {
       primary: "#f87171",
@@ -31,6 +36,7 @@ export const characters = [
     name: "ZED",
     title: "THE MASTER OF SHADOWS",
     role: "ASSASSIN",
+    image: zedImage,
 
     theme: {
       primary: "#c084fc",
@@ -43,6 +49,7 @@ export const characters = [
     name: "AURORA",
     title: "THE WITCH BETWEEN WORLDS",
     role: "MAGE",
+    image: auroraImage,
 
     theme: {
       primary: "#e879f9",
@@ -55,6 +62,7 @@ export const characters = [
     name: "IRELIA",
     title: "THE WILL OF THE BLADES",
     role: "FIGHTER",
+    image: ireliaImage,
 
     theme: {
       primary: "#67e8f9",
