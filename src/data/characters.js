@@ -1,28 +1,50 @@
-import yasuoImage from "../assets/characters/yasuo/yasuo.jpg";
-import rivenImage from "../assets/characters/riven/riven.jpg";
-import zedImage from "../assets/characters/zed/zed.jpg";
-import auroraImage from "../assets/characters/aurora/aurora.jpg";
-import ireliaImage from "../assets/characters/irelia/irelia.jpg";
-
-/*
-  FUNDO ANIMADO
-  Basta colocar um arquivo .webm, .mp4 ou .gif dentro da pasta do campeão:
-
-    src/assets/characters/yasuo/yasuo.webm   (ou .mp4 / .gif)
-
-  Ele é encontrado automaticamente pelo nome da pasta. Se não existir arquivo
-  animado para o campeão, o site usa o .jpg de sempre (nada quebra).
-  Se houver vídeo e gif na mesma pasta, o vídeo tem prioridade.
-*/
-const animatedFiles = import.meta.glob(
-  "../assets/characters/*/*.{webm,mp4,gif}",
+const imageFiles = import.meta.glob(
+  "../assets/characters/*/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}",
   { eager: true, query: "?url", import: "default" }
 );
 
-function findAnimatedMedia(id) {
-  const paths = Object.keys(animatedFiles).filter((path) =>
-    path.includes(`/characters/${id}/`)
+const iconFiles = import.meta.glob(
+  "../assets/characters/icons/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}",
+  { eager: true, query: "?url", import: "default" }
+);
+
+const animatedFiles = import.meta.glob(
+  "../assets/characters/*/*.{webm,mp4,gif,WEBM,MP4,GIF}",
+  { eager: true, query: "?url", import: "default" }
+);
+
+function pathsFor(files, id) {
+  return Object.keys(files).filter((path) =>
+    path.toLowerCase().includes(`/characters/${id}/`)
   );
+}
+
+function findImage(id) {
+  const paths = pathsFor(imageFiles, id);
+
+  const best =
+    paths.find((path) => path.toLowerCase().includes(`/${id}.`)) ?? paths[0];
+
+  return best ? imageFiles[best] : null;
+}
+
+function findIcon(id) {
+  const paths = Object.keys(iconFiles);
+
+  console.log("Procurando ícone:", id);
+  console.log("Arquivos disponíveis:", paths);
+
+  const best = paths.find((path) =>
+    path.toLowerCase().includes(`${id}-icon`)
+  );
+
+  console.log("Ícone encontrado:", best);
+
+  return best ? iconFiles[best] : null;
+}
+
+function findAnimatedMedia(id) {
+  const paths = pathsFor(animatedFiles, id);
 
   const best = paths.find((path) => /\.(webm|mp4)$/i.test(path)) ?? paths[0];
 
@@ -35,7 +57,6 @@ const baseCharacters = [
     name: "YASUO",
     title: "THE UNFORGOTTEN",
     role: "FIGHTER / ASSASSIN",
-    image: yasuoImage,
 
     theme: {
       primary: "#7dd3fc",
@@ -48,7 +69,6 @@ const baseCharacters = [
     name: "RIVEN",
     title: "THE EXILE",
     role: "FIGHTER",
-    image: rivenImage,
 
     theme: {
       primary: "#f87171",
@@ -61,7 +81,6 @@ const baseCharacters = [
     name: "ZED",
     title: "THE MASTER OF SHADOWS",
     role: "ASSASSIN",
-    image: zedImage,
 
     theme: {
       primary: "#c084fc",
@@ -74,7 +93,6 @@ const baseCharacters = [
     name: "AURORA",
     title: "THE WITCH BETWEEN WORLDS",
     role: "MAGE",
-    image: auroraImage,
 
     theme: {
       primary: "#e879f9",
@@ -87,7 +105,6 @@ const baseCharacters = [
     name: "IRELIA",
     title: "THE WILL OF THE BLADES",
     role: "FIGHTER",
-    image: ireliaImage,
 
     theme: {
       primary: "#67e8f9",
@@ -98,5 +115,7 @@ const baseCharacters = [
 
 export const characters = baseCharacters.map((character) => ({
   ...character,
+  image: findImage(character.id),
+  icon: findIcon(character.id),
   media: findAnimatedMedia(character.id),
 }));
