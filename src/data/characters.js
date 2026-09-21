@@ -4,7 +4,32 @@ import zedImage from "../assets/characters/zed/zed.jpg";
 import auroraImage from "../assets/characters/aurora/aurora.jpg";
 import ireliaImage from "../assets/characters/irelia/irelia.jpg";
 
-export const characters = [
+/*
+  FUNDO ANIMADO
+  Basta colocar um arquivo .webm, .mp4 ou .gif dentro da pasta do campeão:
+
+    src/assets/characters/yasuo/yasuo.webm   (ou .mp4 / .gif)
+
+  Ele é encontrado automaticamente pelo nome da pasta. Se não existir arquivo
+  animado para o campeão, o site usa o .jpg de sempre (nada quebra).
+  Se houver vídeo e gif na mesma pasta, o vídeo tem prioridade.
+*/
+const animatedFiles = import.meta.glob(
+  "../assets/characters/*/*.{webm,mp4,gif}",
+  { eager: true, query: "?url", import: "default" }
+);
+
+function findAnimatedMedia(id) {
+  const paths = Object.keys(animatedFiles).filter((path) =>
+    path.includes(`/characters/${id}/`)
+  );
+
+  const best = paths.find((path) => /\.(webm|mp4)$/i.test(path)) ?? paths[0];
+
+  return best ? animatedFiles[best] : null;
+}
+
+const baseCharacters = [
   {
     id: "yasuo",
     name: "YASUO",
@@ -70,3 +95,8 @@ export const characters = [
     },
   },
 ];
+
+export const characters = baseCharacters.map((character) => ({
+  ...character,
+  media: findAnimatedMedia(character.id),
+}));

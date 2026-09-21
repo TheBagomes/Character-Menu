@@ -185,21 +185,19 @@
   background: #050505;
 }
 
-.home-background {
-  position: absolute;
+.home-character {
+ position: absolute;
 
   inset: -3%;
 
   background-size: cover;
   background-position: center;
 
-  transform: scale(1.03);
-
   filter: brightness(0.55);
 
   transition:
-    opacity 0.5s ease,
-    transform 0.8s ease;
+  opacity 0.5s ease,
+  transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 
   animation: homeCharacterEnter 0.8s ease-out;
 }
@@ -251,72 +249,6 @@
   line-height: 0.9;
 
   letter-spacing: 12px;
-}
-
-/* MENU */
-
-.main-menu {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-
-  gap: 14px;
-}
-
-.main-menu button {
-  position: relative;
-
-  border: none;
-  background: transparent;
-
-  color: white;
-
-  font-size: 1.3rem;
-  font-weight: 700;
-
-  letter-spacing: 4px;
-
-  padding: 8px 0;
-
-  cursor: pointer;
-
-  transition:
-    transform 0.25s ease,
-    opacity 0.25s ease;
-}
-
-.main-menu button::before {
-  content: "";
-
-  position: absolute;
-
-  left: -30px;
-  top: 50%;
-
-  width: 0;
-  height: 2px;
-
-  background: var(--primary);
-
-  transform: translateY(-50%);
-
-  box-shadow:
-    0 0 10px var(--primary);
-
-  transition: width 0.25s ease;
-}
-
-.main-menu button:hover {
-  color: var(--primary);
-
-  transform: translateX(20px);
-
-  text-shadow:
-    0 0 15px var(--primary);
-}
-
-.main-menu button:hover::before {
-  width: 20px;
 }
 
 /* PLAYER */
@@ -420,4 +352,49 @@
 
     transform: scale(1.03);
   }
+}
+
+.interactive-object {
+  position: absolute;
+
+  z-index: 4;
+
+  cursor: pointer;
+}
+
+.sword-interaction {
+  width: 180px;
+  height: 280px;
+
+  left: 53%;
+  top: 28%;
+
+  transform: rotate(-25deg);
+}
+
+.sword-interaction {
+  width: 180px;
+  height: 280px;
+
+  left: 53%;
+  top: 28%;
+
+  transform: rotate(-25deg);
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  background: rgba(255, 255, 255, 0.03);
+
+  transition:
+    background 0.2s ease,
+    border 0.2s ease;
+}
+
+.sword-interaction:hover {
+  background: rgba(255, 255, 255, 0.08);
+
+  border: 1px solid var(--primary);
+
+  box-shadow:
+    0 0 20px var(--primary);
 }

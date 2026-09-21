@@ -3,10 +3,23 @@ import { useNavigate } from "react-router-dom";
 
 import { characters } from "../data/characters";
 
+import HomeCharacter from "../components/HomeCharacter";
+import MainMenu from "../components/MainMenu";
+
+import "./HomeStage.css";
+
 function Home() {
   const navigate = useNavigate();
 
-  const [selectedCharacter, setSelectedCharacter] = useState(characters[0]);
+  const [characterIndex, setCharacterIndex] = useState(0);
+  const selectedCharacter = characters[characterIndex];
+
+  // step = -1 (campeão anterior) ou 1 (próximo); dá a volta no fim da lista
+  const changeCharacter = (step) => {
+    setCharacterIndex(
+      (current) => (current + step + characters.length) % characters.length
+    );
+  };
 
   return (
     <main
@@ -16,74 +29,49 @@ function Home() {
         "--secondary": selectedCharacter.theme.secondary,
       }}
     >
-      <div
-        key={selectedCharacter.id}
-        className="home-background"
-        style={{
-          backgroundImage: `url(${selectedCharacter.image})`,
-        }}
-      />
+      <HomeCharacter character={selectedCharacter} />
+
+      <div className="home-scrim" aria-hidden="true" />
 
       <div className="home-overlay" />
 
       <div className="home-content">
+        <MainMenu navigate={navigate} />
 
-        <div className="home-logo">
-          <span>LEAGUE OF LEGENDS</span>
-          <strong>HUB</strong>
-        </div>
+        <div className="home-nameplate">
+          <div className="home-nameplate__switcher">
+            <button
+              type="button"
+              className="home-nameplate__arrow"
+              aria-label="Campeão anterior"
+              onClick={() => changeCharacter(-1)}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 4 7 12l8 8" />
+              </svg>
+            </button>
 
-        <nav className="main-menu">
+            <strong className="home-nameplate__champ">
+              {selectedCharacter.name}
+            </strong>
 
-          <button onClick={() => navigate("/party")}>
-            PARTY
-          </button>
-
-          <button onClick={() => navigate("/mastery")}>
-            MASTERY
-          </button>
-
-          <button onClick={() => navigate("/history")}>
-            HISTORY
-          </button>
-
-          <button onClick={() => navigate("/combos")}>
-            COMBOS
-          </button>
-
-          <button onClick={() => navigate("/highlights")}>
-            HIGHLIGHTS
-          </button>
-
-        </nav>
-
-        <div className="character-selector">
-
-          <span>SELECT BACKGROUND</span>
-
-          <div className="character-buttons">
-            {characters.map((character) => (
-              <button
-                key={character.id}
-                className={
-                  selectedCharacter.id === character.id
-                    ? "active"
-                    : ""
-                }
-                onClick={() => setSelectedCharacter(character)}
-              >
-                {character.name}
-              </button>
-            ))}
+            <button
+              type="button"
+              className="home-nameplate__arrow"
+              aria-label="Próximo campeão"
+              onClick={() => changeCharacter(1)}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m9 4 8 8-8 8" />
+              </svg>
+            </button>
           </div>
 
+          <span className="home-nameplate__title">
+            {selectedCharacter.title}
+          </span>
+          <span className="home-nameplate__player">SORYEGETON</span>
         </div>
-
-        <div className="home-player">
-          <span>PLAYER</span>
-          <strong>SORYEGETON</strong>
-        </div>
-
       </div>
     </main>
   );
