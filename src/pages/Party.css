@@ -1,0 +1,670 @@
+/* Mesma fonte do menu, para a página manter a identidade */
+@import url("https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap");
+
+.party {
+  --accent: #ff2e4d; /* cor de destaque da página: troque à vontade */
+  --ink: #0b0b10;
+  --display: "Abril Fatface", "Playfair Display", "Bodoni MT", Georgia, serif;
+
+  position: relative;
+  min-height: 100vh;
+  padding: clamp(14px, 2.4vw, 36px);
+  overflow-x: hidden;
+  isolation: isolate;
+
+  background: var(--ink);
+  color: #fff;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* Fundo: uma faixa diagonal discreta e um brilho atrás do gráfico */
+.party::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(
+      112deg,
+      transparent 0 58%,
+      color-mix(in srgb, var(--accent) 20%, transparent) 58% 65%,
+      transparent 65%
+    ),
+    radial-gradient(ellipse at 32% 42%, #1d1d2b 0%, transparent 65%);
+}
+
+/* ---------- Cabeçalho ---------- */
+.party__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.party__title {
+  margin: 0;
+  padding: 0 0.6em;
+  background: #fff;
+  color: #111;
+  font: 400 clamp(2.2rem, 5vw, 3.6rem) / 1.15 var(--display);
+  letter-spacing: 0.03em;
+  clip-path: polygon(3% 0, 100% 0, 97% 100%, 0 100%);
+  transform: rotate(-3deg);
+}
+
+.party__back,
+.party__reset,
+.pair-detail__jump button {
+  padding: 0.55rem 1.1rem;
+  border: 0;
+  background: rgb(255 255 255 / 0.12);
+  color: #fff;
+  font: 700 0.72rem / 1 system-ui, sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+  transition: background-color 0.15s ease;
+}
+
+.party__back:hover,
+.party__reset:hover,
+.pair-detail__jump button:hover,
+.party__back:focus-visible,
+.party__reset:focus-visible,
+.pair-detail__jump button:focus-visible {
+  background: var(--accent);
+  outline: none;
+}
+
+/* ---------- Palco: gráfico + painel ---------- */
+.party__stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+  gap: clamp(16px, 3vw, 48px);
+  align-items: center;
+  margin-top: 8px;
+}
+
+/* ---------- Mapa (Summoner's Rift estilizado) ----------
+   Sem overflow:hidden aqui: as zonas de rota (map-zone) são filhas diretas
+   e ficam FORA do wrapper cortado (.map-board__frame), pra rótulos perto
+   da borda (como o TOP) poderem espichar um pouco sem serem cortados. */
+.map-board {
+  position: relative;
+  width: min(100%, 62vh);
+  min-width: 300px;
+  aspect-ratio: 1;
+  margin-inline: auto;
+  margin-top: 26px; /* respiro pra rota TOP não colar no cabeçalho */
+}
+
+/* Wrapper que recorta só a imagem/linhas do mapa em um quadrado limpo */
+.map-board__frame {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.map-board__lines {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.map-board__image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* escurece o mapa (que já tem muito detalhe visual) para as placas
+   brancas e as linhas de sinergia continuarem legíveis por cima */
+.map-board__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 50%, transparent 30%, rgb(0 0 0 / 0.55) 100%),
+    rgb(0 0 0 / 0.28);
+}
+
+.map-board__guide {
+  stroke: rgb(255 255 255 / 0.13);
+  stroke-width: 1;
+  stroke-dasharray: 4 5;
+  vector-effect: non-scaling-stroke;
+}
+
+.map-board__line {
+  opacity: 0.85;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  transition: opacity 0.2s ease;
+}
+
+.map-board__line.is-shown {
+  opacity: 1;
+}
+
+.map-board__line.is-dim {
+  opacity: 0.18;
+}
+
+/* Bolinha com a nota, no meio de cada linha (compartilhada com o mapa) */
+.pair-bubble {
+  position: absolute;
+  z-index: 2;
+  min-width: 2.3rem;
+  height: 1.7rem;
+  padding: 0 0.5rem;
+  border: 0;
+  background: var(--pair-color);
+  box-shadow: 0 0 0 2px var(--ink);
+  color: #111;
+  font: 800 0.85rem / 1 system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transform: translate(-50%, -50%) skewX(-8deg);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pair-bubble:hover,
+.pair-bubble:focus-visible,
+.pair-bubble.is-shown {
+  z-index: 3;
+  box-shadow: 0 0 0 2px #fff;
+  outline: none;
+  transform: translate(-50%, -50%) skewX(-8deg) scale(1.25);
+}
+
+/* Zona de uma rota no mapa: a "área de soltar" é maior que o cartão
+   visível, para facilitar tanto o toque quanto o drop do mouse */
+.map-zone {
+  position: absolute;
+  z-index: 4;
+  width: 16%;
+  padding: 5%;
+  margin: -5%;
+  transform: translate(-50%, -50%);
+}
+
+.map-zone__hit {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.2, 1.3, 0.4, 1);
+}
+
+.map-zone__hit:hover,
+.map-zone__hit:focus-visible {
+  outline: none;
+  transform: scale(1.05);
+}
+
+/* filter (e não outline) porque o clip-path cortaria a borda */
+.map-zone.is-active .map-zone__hit {
+  filter: drop-shadow(0 0 2px var(--accent)) drop-shadow(0 0 12px var(--accent));
+  transform: scale(1.08);
+}
+
+/* Enquanto um campeão é arrastado: toda zona pulsa em verde (qualquer
+   campeão pode ir pra qualquer rota, então não existe mais "zona errada") */
+.map-zone.can-drop {
+  filter: drop-shadow(0 0 10px #7ee787);
+  animation: zone-pulse 0.9s ease-in-out infinite;
+}
+
+@keyframes zone-pulse {
+  50% {
+    filter: drop-shadow(0 0 18px #7ee787);
+  }
+}
+
+.map-zone__lane {
+  align-self: center;
+  padding: 1px 10px;
+  background: rgb(255 255 255 / 0.92);
+  color: #111;
+  font: 800 0.65rem / 1.5 system-ui, sans-serif;
+  letter-spacing: 0.18em;
+  transform: skewX(-10deg);
+}
+
+.map-zone__frame {
+  display: block;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: rgb(255 255 255 / 0.1);
+  border: 2px solid rgb(255 255 255 / 0.25);
+  clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+}
+
+.map-zone__art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 12%; /* mostra o rosto do campeão */
+}
+
+.map-zone__empty {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: rgb(255 255 255 / 0.5);
+  font: 400 2.4rem / 1 var(--display);
+}
+
+.map-zone__name {
+  padding: 0 0.4em;
+  overflow: hidden;
+  background: #fff;
+  color: #111;
+  font: 400 clamp(0.62rem, 1.15vw, 0.9rem) / 1.25 var(--display);
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: rotate(-2deg);
+}
+
+.map-zone:not(.is-filled) .map-zone__name {
+  background: none;
+  color: rgb(255 255 255 / 0.6);
+  font: 700 0.65rem / 1.5 system-ui, sans-serif;
+  letter-spacing: 0.14em;
+}
+
+/* ---------- Painel lateral ---------- */
+.party-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.party-panel__block {
+  padding: 16px 18px 18px;
+  background: rgb(255 255 255 / 0.06);
+  border-left: 4px solid var(--accent);
+}
+
+.party-panel__heading {
+  display: inline-block;
+  margin: 0 0 10px;
+  padding: 2px 14px;
+  background: #fff;
+  color: #111;
+  font: 400 1.05rem / 1.4 var(--display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+
+.party-panel__hint {
+  margin: 8px 0 0;
+  color: rgb(255 255 255 / 0.65);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.team-score {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+
+.team-score__value {
+  font: 400 4rem / 1 var(--display);
+}
+
+.team-score__tier {
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.team-score__count {
+  flex-basis: 100%;
+  color: rgb(255 255 255 / 0.55);
+  font-size: 0.75rem;
+}
+
+.team-warnings {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.team-warnings li {
+  padding: 6px 10px 6px 12px;
+  background: rgb(255 180 0 / 0.14);
+  border-left: 3px solid #ffb400;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* Dupla em foco */
+.pair-detail__names {
+  margin: 0;
+  font: 400 1.6rem / 1.15 var(--display);
+}
+
+.pair-detail__names span {
+  margin: 0 0.2em;
+  color: var(--accent);
+}
+
+.pair-detail__lanes {
+  margin: 2px 0 0;
+  color: rgb(255 255 255 / 0.6);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.pair-detail__score {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 10px 0 8px;
+}
+
+.pair-detail__score strong {
+  font: 400 2.6rem / 1 var(--display);
+}
+
+.pair-detail__score span {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pair-detail__reasons {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pair-detail__reasons li {
+  display: flex;
+  gap: 10px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.pair-detail__reasons b {
+  flex: none;
+  min-width: 2.2em;
+  color: rgb(255 255 255 / 0.6);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.pair-detail__reasons .is-plus b {
+  color: #7ee787;
+}
+
+.pair-detail__reasons .is-minus b {
+  color: #ff7b72;
+}
+
+.pair-detail__jump {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+/* ---------- Seletor de campeões (estilo tela de seleção) ---------- */
+.party-picker {
+  margin-top: clamp(14px, 3vh, 32px);
+}
+
+.party-picker__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.party-picker__title {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin: 0;
+  font: 400 1.6rem / 1 var(--display);
+  text-transform: uppercase;
+}
+
+.party-picker__title span {
+  color: rgb(255 255 255 / 0.6);
+  font: 600 0.75rem / 1 system-ui, sans-serif;
+  letter-spacing: 0.16em;
+}
+
+.party-picker__search {
+  flex: 0 1 240px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  background: rgb(0 0 0 / 0.35);
+  color: #f1f1f1;
+  font-size: 0.9rem;
+}
+
+.party-picker__search::placeholder {
+  color: rgb(255 255 255 / 0.45);
+}
+
+.party-picker__search:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.party-picker__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.9rem 0 1.1rem;
+}
+
+.role-chip {
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  background: transparent;
+  color: rgb(255 255 255 / 0.75);
+  font: 700 0.7rem / 1 system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.role-chip:hover {
+  border-color: rgb(255 255 255 / 0.4);
+  color: #fff;
+}
+
+.role-chip.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* Grade densa de ícones quadrados, como a tela oficial de seleção */
+.party-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: clamp(4px, 0.8vw, 8px);
+}
+
+.pick-card {
+  position: relative;
+  aspect-ratio: 1;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: rgb(255 255 255 / 0.07);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: grab;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pick-card:active {
+  cursor: grabbing;
+}
+
+.pick-card:hover,
+.pick-card:focus-visible {
+  z-index: 1;
+  outline: none;
+  transform: scale(1.08);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.5);
+}
+
+.pick-card.is-selected {
+  box-shadow: inset 0 0 0 3px var(--accent), 0 0 10px var(--accent);
+}
+
+/* campeão já escalado em outra rota: fica meio apagado na grade */
+.pick-card.is-picked-elsewhere {
+  opacity: 0.45;
+}
+
+.pick-card__art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 15%;
+}
+
+.pick-card__name {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 3px 5px 2px;
+  overflow: hidden;
+  background: linear-gradient(to top, rgb(0 0 0 / 0.88), transparent);
+  font: 700 0.58rem / 1.25 system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pick-card__badge {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgb(0 0 0 / 0.75);
+  color: var(--accent);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.party-picker__empty {
+  grid-column: 1 / -1;
+  padding: 2rem 0;
+  color: rgb(255 255 255 / 0.5);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* Se a imagem do campeão não carregar: só a inicial */
+.champion-art--fallback {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(160deg, #3a3a4a, #15151d);
+  color: #fff;
+  font: 400 2.4rem / 1 var(--display);
+}
+
+/* ---------- Telas menores ---------- */
+@media (max-width: 900px) {
+  .party__stage {
+    grid-template-columns: 1fr;
+  }
+
+  .map-board {
+    width: min(100%, 92vw);
+  }
+}
+
+@media (max-width: 700px) {
+  .map-zone {
+    width: 20%;
+  }
+}
+
+@media (max-width: 440px) {
+  .party-picker__grid {
+    grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+  }
+
+  /* No celular, tudo do mapa encolhe para as placas não se sobreporem */
+  .map-zone__lane {
+    padding: 0 6px;
+    font-size: 0.52rem;
+    letter-spacing: 0.1em;
+  }
+
+  .map-zone__name {
+    font-size: 0.6rem;
+  }
+
+  .map-zone:not(.is-filled) .map-zone__name {
+    font-size: 0.55rem;
+    letter-spacing: 0.06em;
+  }
+
+  .pair-bubble {
+    min-width: 1.7rem;
+    height: 1.3rem;
+    padding: 0 0.3rem;
+    font-size: 0.68rem;
+  }
+}
+
+/* ---------- Respeita quem desativa animações ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .map-zone,
+  .pair-bubble,
+  .pick-card,
+  .map-board__line {
+    transition: none;
+  }
+
+  .map-zone.can-drop {
+    animation: none;
+  }
+}
